@@ -97,6 +97,17 @@
   font-weight: bold;
 }
 
+.form--login__button,
+.form--login__social,
+.signup-button,
+.signup-social {
+  width: 40%;
+}
+
+.button--login {
+  width: 100%;
+}
+
 .button--main:hover {
   background-color: #2f0059;
 }
@@ -119,8 +130,9 @@
   width: 20%;
 }
 .googleIcon {
-  width: 70%;
+  width: 20px;
   float: left;
+  margin-left: 4px;
 }
 
 .form--separator {
@@ -187,6 +199,18 @@
 .fa-times {
   color: #f11c40e8;
 }
+.btn-saveEditPost {
+  display: none;
+}
+
+.postAreaUser{
+  margin: 50px;
+}
+
+/* ocultar boton guardar cambios */
+/* .btn-cancelEdit{
+  display: none;
+} */
 
 @media (min-width: 600px) {
   .form--login__inputList,
