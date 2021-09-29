@@ -2,13 +2,20 @@ import { loginEmail, loginGoogle } from "../firebase/fb-functions.js";
 
 const viewLogin = () => {
   const htmlLogin = `
-  <div class="viewDesktop">
-    <img class="viewDesktop__logo" src="./img/logoMobilPrueba.jpg" alt="Makipura">
+  <div class="viewDesktop" >
+
+     <div class="container__logoDesktop">
+    <img class="viewDesktop__logo" src="./img/logoMobilPrueba.png" alt="Makipura">
+    </div>
+
+    <div class="container__logoDesktopWoman">
     <img class="viewDesktop__woman" src="./img/woman.png" alt="Makipura">
+    </div>
+
   </div>
   <div class="login">
     <div class="logo">
-      <img class="logo__img" src="./img/logoMobilPrueba.jpg" alt="Makipura" width="150">
+      <img class="logo__img" src="./img/logoMobilPrueba.png" alt="Makipura" >
     </div>
     <div class="login__Subtitle">
       <h2 class="login__h2">¡Bienvenida Emprendedora!</h2>
@@ -44,7 +51,7 @@ const viewLogin = () => {
       </div>
     </form>
     <div class="login__registerLink">
-      <p>No tienes cuenta</br>Registrate<a class="link" href="#/register"> aquí</a></p>
+      <p>¿No tienes cuenta?</br>Registrate<a class="link" href="#/register"> aquí</a></p>
     </div>
   </div>
     `;
@@ -65,8 +72,6 @@ const viewLogin = () => {
   const passwordLogin = sectionLogin.querySelector("#passwordLogin");
 
   emailLogin.addEventListener("keyup", () => {
-    console.log("auchhh");
-
     const regEx = /^([\da-z_.-]+)@([\da-z]+)\.([a-z]{2,6})$/gim;
 
     if (regEx.test(emailLogin.value)) {
@@ -79,7 +84,7 @@ const viewLogin = () => {
     } else {
       spanEmail.classList.remove("validateEmail");
       spanEmail.classList.add("invalidEmail");
-      spanEmail.innerHTML = "Correo incorrecto";
+      spanEmail.innerHTML = "Ingrese un correo válido";
       divForm.style.borderColor = "red";
       iconCheck.classList.remove("fa-check");
       iconCheck.classList.add("fa-times");
@@ -116,8 +121,14 @@ const viewLogin = () => {
         //clear form
         loginForm.reset();
         // changeLogin();
-        console.log("ya estas dentro");
-        window.open("#/home", "_self");
+        firebase.auth().onAuthStateChanged((user) => {
+          // changeLogin();
+          if(user.emailVerified){
+            window.open("#/home", "_self");
+          }else {
+            //
+          }
+        })  
       })
       .catch(() => {
         spanErrorLogin.classList.add("errorLogin");
@@ -130,22 +141,28 @@ const viewLogin = () => {
       spanErrorLogin.classList.remove("invalidEmail");
       spanErrorLogin.innerHTML = "";
     }, 2000);
+
   });
 
   const buttonGoogleLogin = sectionLogin.querySelector("#buttonGoogleLogin");
   buttonGoogleLogin.addEventListener("click", () => {
     loginGoogle()
       .then(() => {
-        console.log("signin with google");
         window.open("#/home", "_self");
       })
       .catch((error) => {
         console.log(error);
       });
-    console.log("click google");
   });
+
+
+
+
 
   return sectionLogin;
 };
+// window.history.go(0)
+
+      
 
 export { viewLogin };
