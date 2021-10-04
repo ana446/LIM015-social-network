@@ -3,9 +3,10 @@ import {
   onGetPosts,
   updatePost,
   getPost,
+  onGetUsers,
 } from "../firebase/fb-firestore.js";
 
-
+import {uploadImages} from '../firebase/fb-storage.js'
 import {modalDelete} from "../view/modals.js"
 
 const viewHome = () => {
@@ -23,30 +24,99 @@ const viewHome = () => {
         <section id="postHomeContainer" class="home__postContainer">
           <form id="postHome-form">
             <div id="boxInputPost" class="home__postImput">
-              <textarea id="postArea" class="HomeShare__input" placeholder="¿ Que desea compartir?"
-                autofocus></textarea>
+              <textarea id="postArea" class="HomeShare__input" placeholder="¿ Que desea compartir?" autofocus></textarea>
+              <div id="postImgPreview"></div>
             </div>
             <div class="home__buttonPost" >
+              <div>
+              <label for='imgButton' >                
+                  <i class="fas fa-images"></i>
+              </label>  
+              <input  type="file" accept="image/png, image/jpeg" value="upload" id='imgButton' hidden>            
+              </div>
               <input type="submit" id="buttonPostHome" class="button button--main" value="Compartir"> 
             </div>
           </form>
         </section>
         <section id="postsHomeContainer" class="home__PostsContainer">
         </section>
+        <section id="containerListUsers" class="home__PostsContainer containerUsers">
+          <div class='listUsers__tittle'> EMPRENDEDORAS</div>
+          <div id = 'listUsers'></div>
+        </section>
       </section>
+
       `;
   const divHome = document.createElement("div");
   divHome.innerHTML = htmlHome;
-
   divHome.classList.add('homeContainer')
+
+
   const homePost = divHome.querySelector("#postHome-form");
   const postArea = divHome.querySelector("#postArea");
   const postNameUser = divHome.querySelector("#home__userName");
   const postPhotoUser = divHome.querySelector(".imgUser");
   const postListContainer = divHome.querySelector("#postsHomeContainer");
-  
-  firebase.auth().onAuthStateChanged((user) => {
+  const listUsers =divHome.querySelector('#listUsers');
+  const imgButton = divHome.querySelector('#imgButton');
+ 
+/* funcion para mostrar la lista de emprendedoras*/
+ const showAllUser = ()=> {
+  onGetUsers((dataUsers)=>{
+    listUsers.innerHTML= '';
+    dataUsers.forEach((dataUser)=> {
+      
+      const divListUsers = `
+      
+    <div class='boxUser'>
+      <div class='divUserBox' >
+      <img class='imgUser imgUserList' src='${dataUser.userPhoto}'>
+      </div>
+      <div class='divUserBox'>
+      <p class = 'pUser'>${dataUser.userName} ${dataUser.userLastname}</p>
+      </div>      
+    </div>
+    `; 
 
+   listUsers.innerHTML += divListUsers;
+    })    
+  })
+ }
+/* funcion para subir imagenes*/
+  // --ENVIA IMG A FIREBASE AL MOEMNTO DE DAR CLICK ABRIR
+
+const preViewImg = (e) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(e.target.files[0]);
+
+    reader.onload = function () {
+      const preview = divHome.querySelector('#postImgPreview');
+      const image = document.createElement('img');
+      const deletePreviewImg = document.createElement('span')
+      deletePreviewImg.classList.add('closeModal')
+      image.classList.add('imgPreview')
+
+      image.src = reader.result;
+
+      preview.innerHTML = '';
+      deletePreviewImg.innerHTML = `<i class="fas fa-times-circle"></i>`;
+      preview.append(deletePreviewImg);
+      preview.append(image);
+      
+      //eliminar la imagen
+      const btnDeletePreviewImg = divHome.querySelector('.fa-times-circle')
+      console.log(btnDeletePreviewImg)
+      btnDeletePreviewImg.addEventListener('click', ()=>{
+        divHome.querySelector('#postImgPreview').innerHTML = '';
+      });
+          
+
+    };
+};
+ imgButton.addEventListener('change', (e) => {preViewImg(e); });
+
+
+firebase.auth().onAuthStateChanged((user) => {
     if (user) {
       savePostCurrentUser(user,homePost ,postArea);
       postNameUser.innerHTML = user.displayName;
@@ -54,16 +124,14 @@ const viewHome = () => {
       onGetPosts((data) => {
         setTemplateListPosts(data, user,postListContainer);
       });
+      showAllUser()
+      
     } else {
       window.location.hash('#/')
     }
-  });
-  
+  });  
       return divHome;
-
 };
-
-
 
 /* FUNCION PARA PINTAR EL POST*/
 
@@ -72,7 +140,7 @@ const setTemplateListPosts = (data, user,postListContainer) => {
     postListContainer.innerHTML = "";
 
     data.forEach((doc) => {
-      const postText = doc.data();
+      const postText = doc/*.data()*/;
       postText.id = doc.id;
 
       postListContainer.innerHTML += /*html*/ `
@@ -87,10 +155,12 @@ const setTemplateListPosts = (data, user,postListContainer) => {
           </div>
         </div>
         <div class="post__inputtext">
-        ${
-          postText.userId === user.uid ?`
+        ${ postText.userPost? `
+        ${postText.userId === user.uid ?`
           <textarea class="post__input" id="text-${postText.id}" data-id="${postText.userId}"readonly>${postText.userPost}</textarea>`:
-          `<p class="post__paragraph" id="text-${postText.id}" data-id="${postText.userId}"readonly>${postText.userPost}</p>`}         
+          `<p class="post__paragraph" id="text-${postText.id}" data-id="${postText.userId}"readonly>${postText.userPost}</p>`} `:``}
+          ${postText.url? `<img class="post__imgPost" src="${postText.url}"  alt="photoPost">`: ``}
+             
         </div>
         
         <div class="home_likeButtonSection">
@@ -142,15 +212,11 @@ const setTemplateListPosts = (data, user,postListContainer) => {
       icon.addEventListener('click' , async (e)=>{
         const idDocPost = e.target.dataset.id;
         let likesArray = await getPost(idDocPost).then((doc)=>{
-          console.log(doc.data().likes)
           return  doc.data().likes
         })
            if(!likesArray.includes(user.uid)){
             likesArray.push(user.uid);
              await updatePost(idDocPost,{ likes: likesArray});    
-
-            console.log('si le diste likee')
-
           }else{
             
             likesArray=likesArray.filter(lik=>lik!==user.uid);
@@ -231,43 +297,62 @@ const setTemplateListPosts = (data, user,postListContainer) => {
 };
 
 
-
-
 /*funcion de guardar data de post en el firestore */ 
+
+
 const savePostCurrentUser = (user,homePost ,postArea) => {
-   return  homePost.addEventListener("submit", async (e) => {
-      try {
-        if(postArea.value) {
-          e.preventDefault();
-          const usernamePost = user.displayName; //verificar donde pasa el nombre del firebase al div
-          const userPost = postArea.value;
-          const date = new Date().toLocaleString("es-ES");
-          const userId = user.uid;
-          const userPhoto = user.photoURL;
-          const likes = [];
-          await savePost(usernamePost, userPost, date, userId, userPhoto, likes);
-          homePost.reset();
-          postArea.focus();
-        }else{
-          postArea.focus();
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    });
+
+   return  homePost.addEventListener("submit",  (e) => {
+      
+        e.preventDefault();
+        const idDocPost = e.target.dataset.id;
+        const postTextPublic = document.getElementById(`text-${idDocPost}`);
+        const usernamePost = user.displayName; //verificar donde pasa el nombre del firebase al div
+        const userPostText = postArea.value;
+        const date = new Date().toLocaleString("es-ES");
+        const userId = user.uid;
+        const userPhoto = user.photoURL;
+        const likes = [];
+        const inputImg = homePost[1].files;
+
+        console.log(typeof userPostText , 'texto ' , postTextPublic)
+          if(inputImg.length >= 1 &&  userPostText ){
+            const file = inputImg[0];
+            uploadImages(`images/${file.name}`, file).then((snapshot) => {
+                snapshot.ref.getDownloadURL().then((url) => {
+                  savePost(usernamePost, userPostText, date, userId, userPhoto, likes, url);
+                });
+              });
+          }
+          else if(inputImg.length >= 1 && !userPostText ){
+          //  postTextPublic.style.display= 'none';
+          const file = inputImg[0];
+          uploadImages(`images/${file.name}`, file).then((snapshot) => {
+              snapshot.ref.getDownloadURL().then((url) => {
+                savePost(usernamePost,'', date, userId, userPhoto, likes, url);
+              });
+            });
+          }
+          else if(inputImg.length == 0 && userPostText ){
+            //  postTextPublic.style.display= 'none';
+           
+            savePost(usernamePost, userPostText, date, userId, userPhoto, likes, '');
+          }
+          else {
+            postArea.focus();        
+
+          }
+        
+          
+
+        homePost.reset();
+        homePost.querySelector('#postImgPreview').innerHTML = '';
+        postArea.focus();
+       
+   })
 };
 
 
-/*const loadPage = () => {
-  window.addEventListener("popstate", e => {
-    console.log (e);
-    console.log ("estoy regresando a la pagina");
-    console.log(history.back())
-    history.pushState('null', 'null', './home');
-  })
-}
-
-loadPage();*/
 
 export { viewHome,savePostCurrentUser,setTemplateListPosts};
 

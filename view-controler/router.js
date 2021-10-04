@@ -35,7 +35,7 @@ const changeView=(route) => {
       break;
       case '#/profile':firebase.auth().onAuthStateChanged((user) => {
         if(user){
-          if(user.emailVerified){container.appendChild(components.header()); container.appendChild(components.profile())}
+          if(user.emailVerified){container.appendChild(components.header()); container.appendChild(components.profile()); container.appendChild(components.footer())}
           else{window.location.replace('#')}
         }
         else{window.location.replace('#')}
@@ -46,5 +46,6 @@ const changeView=(route) => {
       }
   
 }
+console.log("hola");
 
 export  {changeView}
