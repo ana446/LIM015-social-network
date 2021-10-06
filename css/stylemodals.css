@@ -83,6 +83,131 @@
 }
 
 
+/*modal Profile */
+.containerLogoModalProfile{
+  display: flex;
+  justify-content: center;
+}
+
+.logoModalProfile{
+  width: 65%;
+  padding-top:0;
+}
+
+
+
+.form_modalProfile{
+  display: flex;
+  flex-direction: column;
+
+}
+
+.inputContacto {
+  display: flex;
+  flex-direction: column;
+  padding-left: 1em ;
+
+}
+
+.profileNameAndLastName{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 0.2em;
+}
+
+#userNameMP {
+ margin-right: 0.25em;
+}
+
+#userLastNameMP {
+ margin-left: 0.25em;
+}
+
+.profileInputs{
+  display: flex;
+  flex-direction:column;
+  padding-top: 0.5em;
+}
+
+.profileInputs >label,.informLabel {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+
+.inputContacto_inputsLabels{
+  padding: 0.5em 0.1em ;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.inputContacto_inputsLabels >label{
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.btnModalProfile{
+  padding: 0.5em  0.5em ;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 2em;
+  
+}
+
+.modalContainerProfile{
+  padding-top: 1.5em;
+  overflow: scroll;
+
+}
+
+.inputs {
+  flex-grow: 2;
+  height: 6vh;
+  padding: 0.5em;
+  border-radius: 10px;
+  color: #616161;
+  background-color: #F3EFF6;
+  border-style: none;
+  min-width: 25px;
+}
+
+
+.inputs:focus {
+  outline: none ;
+  border:1px solid rgb(143, 44, 113);
+  box-shadow: 0 0 10px #719ECE;
+}
+
+.inputContacto_inputsLabels >input{
+  height: 5vh;
+}
+
+
+.textareaProfileModal{
+  width: 100%;
+  height: 4em;
+  border-style: none;
+  resize:none;
+  padding: 0.5rem;
+  margin-top:0.5rem;
+
+}
+
+.inputsA {
+  margin: 0.5em 0;
+}
+
+.inputsB {
+  margin-left: 0.5em;
+}
+
+
+.modalContent--profile{
+ width: 90%;
+}
+
+
+
 @media screen and (min-width:  600px) {
 
   .modalContainer{
@@ -90,9 +215,14 @@
  } 
 
 
+ .modalContainerProfile{
+  padding-top: 1em;
+ }
+
+
   .modalContent{
     max-width: 400px;
-    padding: 0.6em 1.2em 1.2em 1.2em;
+    padding: 0.6em 1.2em 0.6em 1.2em;
 }
 
 }

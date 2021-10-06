@@ -1,7 +1,6 @@
 import {
   registerEmail,
   loginGoogle,
-  updateProfile,
   emailVerification,
 } from "../firebase/fb-functions.js";
 import {
@@ -159,18 +158,28 @@ const viewRegister = () => {
           console.log(name);
             const uLastname = '';
             const uPhoto = './img/usuario.png';
-          console.log(uPhoto)
-            const userProfile = {
-             userId : uId,
-             userName: uName.toLowerCase(),
-             userLastname: uLastname.toLowerCase(),
-             userPhoto: uPhoto,
+            const uEmail=email;
+            const uPhone="999 999 999";
+            const uCompany="Mi Empresa SAC";
+            const uLocation="Distrito, Departamento, Perú";
+            const uDescription="Describe tu emprendimiento";
+
+            const userProfile = {  
+            userId : uId,
+            userName: uName.toLowerCase(),
+            userLastname: uLastname.toLowerCase(),
+            userPhoto: uPhoto,
+            userEmail:uEmail,
+            userPhone:uPhone,
+            userCompany:uCompany,
+            userLocation:uLocation,
+            userDescription:uDescription
             };
             saveUser(userProfile);
 
           //base de datos de usuario
           if (email && name && password) {
-            updateProfile(name);
+            //updateProfile(name);
             emailVerification();
           }
           signupForm.reset();
@@ -204,14 +213,28 @@ const viewRegister = () => {
         const uName = userCredential.additionalUserInfo.profile.given_name;
         const uLastname = userCredential.additionalUserInfo.profile.family_name;
         const uPhoto = userCredential.additionalUserInfo.profile.picture;
-        
+        const uEmail=userCredential.user.email;
+        const uPhone="999 999 999";
+        const uCompany="Mi Empresa SAC";
+        const uLocation="Distrito, Departamento, Perú";
+        const uDescription="Describe tu emprendimiento";
+
+
         const userProfile = {
          userId : uId,
          userName: uName.toLowerCase(),
          userLastname: uLastname.toLowerCase(),
          userPhoto: uPhoto,
+         userEmail:uEmail,
+         userPhone:uPhone,
+         userCompany:uCompany,
+         userLocation:uLocation,
+         userDescription:uDescription
+
         };
         saveUser(userProfile);
+        /*guardar data en local storage*/
+        //localStorage.setItem("User",userProfile)
       }
       window.open("#/home", "_self");
     })
