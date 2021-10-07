@@ -61,6 +61,7 @@ const viewHome = () => {
 /* funcion para mostrar la lista de emprendedoras*/
  const showAllUser = ()=> {
   onGetUsers((dataUsers)=>{
+    console.log(dataUsers);
     listUsers.innerHTML= '';
     dataUsers.forEach((dataUser)=> {
       
@@ -128,7 +129,8 @@ firebase.auth().onAuthStateChanged((user) => {
     } else {
       window.location.hash('#/')
     }
-  });  
+  }); 
+   
       return divHome;
 };
 
@@ -150,11 +152,12 @@ const savePostCurrentUser = (data,homePost ,postArea) => {
         const userPhoto = data.userPhoto;
         const likes = [];
         const inputImg = homePost[1].files;
-
-          if(inputImg.length >= 1 &&  userPostText ){
+        console.log(usernamePost)
+          if(inputImg.length >= 1 &&  userPostText ){ 
             const file = inputImg[0];
             uploadImages(`images/${file.name}`, file).then((snapshot) => {
                 snapshot.ref.getDownloadURL().then((url) => {
+                  
                   savePost(usernamePost, userPostText, date, userId, userPhoto, likes, url);
                 });
               });
@@ -170,7 +173,7 @@ const savePostCurrentUser = (data,homePost ,postArea) => {
           }
           else if(inputImg.length == 0 && userPostText ){
             //  postTextPublic.style.display= 'none';
-           
+            
             savePost(usernamePost, userPostText, date, userId, userPhoto, likes, '');
           }
           else {
